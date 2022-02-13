@@ -17,14 +17,14 @@ with open(os.path.join(this_directory, 'README.md')) as f:
     long_description = f.read()
 
 setup(
-    name='tfrecord',
-    version='1.14.1',
+    name='tfrecord_tj',
+    version='0.0.0',
     description='TFRecord reader',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    author='Vahid Kazemi',
-    author_email='vkazemi@gmail.com',
-    url='https://github.com/vahidk/tfrecord',
+    author='Tao Jiang',
+    author_email='tjiang.work@gmail.com',
+    url='https://github.com/seamanj/tfrecord_tj.git',
     packages=find_packages(),
     license='MIT',
     install_requires=install_requires
