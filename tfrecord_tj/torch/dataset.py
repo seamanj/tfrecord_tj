@@ -1,12 +1,12 @@
-"""Load tfrecord files into torch datasets."""
+"""Load tfrecord_tj files into torch datasets."""
 
 import typing
 import numpy as np
 
 import torch.utils.data
 
-from tfrecord import reader
-from tfrecord import iterator_utils
+from tfrecord_tj import reader
+from tfrecord_tj import iterator_utils
 
 
 class TFRecordDataset(torch.utils.data.IterableDataset):
@@ -48,7 +48,7 @@ class TFRecordDataset(torch.utils.data.IterableDataset):
         passed, then all features contained in the file are extracted.
 
     compression_type: str, optional, default=None
-        The type of compression used for the tfrecord. Choose either
+        The type of compression used for the tfrecord_tj. Choose either
         'gzip' or None.
 
     """
@@ -133,7 +133,7 @@ class MultiTFRecordDataset(torch.utils.data.IterableDataset):
         passed, then all features contained in the file are extracted.
 
     compression_type: str, optional, default=None
-        The type of compression used for the tfrecord. Choose either
+        The type of compression used for the tfrecord_tj. Choose either
         'gzip' or None.
     
     infinite: bool, optional, default=True

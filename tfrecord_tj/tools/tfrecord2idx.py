@@ -41,7 +41,7 @@ def create_index(tfrecord_file: str, index_file: str) -> None:
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: tfrecord2idx <tfrecord path> <index path>")
+        print("Usage: tfrecord2idx <tfrecord_tj path> <index path>")
         sys.exit()
 
     create_index(sys.argv[1], sys.argv[2])

@@ -10,7 +10,7 @@ try:
 except ImportError:
     crc32c = None
 
-from tfrecord import example_pb2
+from tfrecord_tj import example_pb2
 
 
 class TFRecordWriter:
@@ -19,20 +19,20 @@ class TFRecordWriter:
     Params:
     -------
     data_path: str
-        Path to the tfrecord file.
+        Path to the tfrecord_tj file.
     """
 
     def __init__(self, data_path: str) -> None:
         self.file = io.open(data_path, "wb")
 
     def close(self) -> None:
-        """Close the tfrecord file."""
+        """Close the tfrecord_tj file."""
         self.file.close()
 
     def write(self, datum: typing.Dict[str, typing.Tuple[typing.Any, str]],
               sequence_datum: typing.Union[typing.Dict[str, typing.Tuple[typing.List[typing.Any], str]], None] = None,
               ) -> None:
-        """Write an example into tfrecord file. Either as a Example
+        """Write an example into tfrecord_tj file. Either as a Example
         SequenceExample depending on the presence of `sequence_datum`.
         If `sequence_datum` is None (by default), this writes a Example
         to file. Otherwise, it writes a SequenceExample to file, assuming
@@ -73,7 +73,7 @@ class TFRecordWriter:
 
     @staticmethod
     def serialize_tf_example(datum: typing.Dict[str, typing.Tuple[typing.Any, str]]) -> bytes:
-        """Serialize example into tfrecord.Example proto.
+        """Serialize example into tfrecord_tj.Example proto.
 
         Params:
         -------
@@ -84,7 +84,7 @@ class TFRecordWriter:
         Returns:
         --------
         proto: bytes
-            Serialized tfrecord.example to bytes.
+            Serialized tfrecord_tj.example to bytes.
         """
         feature_map = {
             "byte": lambda f: example_pb2.Feature(
@@ -108,7 +108,7 @@ class TFRecordWriter:
     def serialize_tf_sequence_example(context_datum: typing.Dict[str, typing.Tuple[typing.Any, str]],
                                       features_datum: typing.Dict[str, typing.Tuple[typing.List[typing.Any], str]],
                                       ) -> bytes:
-        """Serialize sequence example into tfrecord.SequenceExample proto.
+        """Serialize sequence example into tfrecord_tj.SequenceExample proto.
 
         Params:
         -------
@@ -122,7 +122,7 @@ class TFRecordWriter:
         Returns:
         --------
         proto: bytes
-            Serialized tfrecord.SequenceExample to bytes.
+            Serialized tfrecord_tj.SequenceExample to bytes.
         """
         feature_map = {
             "byte": lambda f: example_pb2.Feature(

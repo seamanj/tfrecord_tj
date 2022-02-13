@@ -17,11 +17,12 @@ python3 -m tfrecord.tools.tfrecord2idx <tfrecord path> <index path>
 
 ### Reading tf.Example records in PyTorch
 Use TFRecordDataset to read TFRecord files in PyTorch.
+
 ```python
 import torch
-from tfrecord.torch.dataset import TFRecordDataset
+from tfrecord_tj.torch.dataset import TFRecordDataset
 
-tfrecord_path = "/tmp/data.tfrecord"
+tfrecord_path = "/tmp/data.tfrecord_tj"
 index_path = None
 description = {"image": "byte", "label": "float"}
 dataset = TFRecordDataset(tfrecord_path, index_path, description)
@@ -32,11 +33,12 @@ print(data)
 ```
 
 Use MultiTFRecordDataset to read multiple TFRecord files. This class samples from given tfrecord files with given probability.
+
 ```python
 import torch
-from tfrecord.torch.dataset import MultiTFRecordDataset
+from tfrecord_tj.torch.dataset import MultiTFRecordDataset
 
-tfrecord_pattern = "/tmp/{}.tfrecord"
+tfrecord_pattern = "/tmp/{}.tfrecord_tj"
 index_pattern = "/tmp/{}.index"
 splits = {
     "dataset1": 0.8,
@@ -68,10 +70,11 @@ dataset = TFRecordDataset(..., shuffle_queue_size=1024)
 
 You can optionally pass a function as `transform` argument to perform post processing of features before returning. 
 This can for example be used to decode images or normalize colors to a certain range or pad variable length sequence.
- 
+
 ```python
-import tfrecord
+import tfrecord_tj
 import cv2
+
 
 def decode_image(features):
     # get BGR image from bytes
@@ -83,20 +86,21 @@ description = {
     "image": "bytes",
 }
 
-dataset = tfrecord.torch.TFRecordDataset("/tmp/data.tfrecord",
-                                         index_path=None,
-                                         description=description,
-                                         transform=decode_image)
+dataset = tfrecord_tj.torch.TFRecordDataset("/tmp/data.tfrecord_tj",
+                                            index_path=None,
+                                            description=description,
+                                            transform=decode_image)
 
 data = next(iter(dataset))
 print(data)
 ```
 
 ### Writing tf.Example records in Python
-```python
-import tfrecord
 
-writer = tfrecord.TFRecordWriter("/tmp/data.tfrecord")
+```python
+import tfrecord_tj
+
+writer = tfrecord_tj.TFRecordWriter("/tmp/data.tfrecord_tj")
 writer.write({
     "image": (image_bytes, "byte"),
     "label": (label, "float"),
@@ -106,10 +110,11 @@ writer.close()
 ```
 
 ### Reading tf.Example records in Python
-```python
-import tfrecord
 
-loader = tfrecord.tfrecord_loader("/tmp/data.tfrecord", None, {
+```python
+import tfrecord_tj
+
+loader = tfrecord_tj.tfrecord_loader("/tmp/data.tfrecord_tj", None, {
     "image": "byte",
     "label": "float",
     "index": "int"
@@ -127,9 +132,9 @@ read/write functions to treat the data as a SequenceExample.
 ### Writing SequenceExamples to file
 
 ```python
-import tfrecord
+import tfrecord_tj
 
-writer = tfrecord.TFRecordWriter("/tmp/data.tfrecord")
+writer = tfrecord_tj.TFRecordWriter("/tmp/data.tfrecord_tj")
 writer.write({'length': (3, 'int'), 'label': (1, 'int')},
              {'tokens': ([[0, 0, 1], [0, 1, 0], [1, 0, 0]], 'int'), 'seq_labels': ([0, 1, 1], 'int')})
 writer.write({'length': (3, 'int'), 'label': (1, 'int')},
@@ -142,13 +147,13 @@ writer.close()
 Reading from a SequenceExample yeilds a tuple containing two elements.
 
 ```python
-import tfrecord
+import tfrecord_tj
 
 context_description = {"length": "int", "label": "int"}
 sequence_description = {"tokens": "int", "seq_labels": "int"}
-loader = tfrecord.tfrecord_loader("/tmp/data.tfrecord", None,
-                                  context_description,
-                                  sequence_description=sequence_description)
+loader = tfrecord_tj.tfrecord_loader("/tmp/data.tfrecord_tj", None,
+                                     context_description,
+                                     sequence_description=sequence_description)
 
 for context, sequence_feats in loader:
     print(context["label"])
@@ -164,22 +169,25 @@ variable length sequence and need to be padded out before being batched.
 ```python
 import torch
 import numpy as np
-from tfrecord.torch.dataset import TFRecordDataset
+from tfrecord_tj.torch.dataset import TFRecordDataset
 
 PAD_WIDTH = 5
+
+
 def pad_sequence_feats(data):
     context, features = data
     for k, v in features.items():
         features[k] = np.pad(v, ((0, PAD_WIDTH - len(v)), (0, 0)), 'constant')
     return (context, features)
 
+
 context_description = {"length": "int", "label": "int"}
 sequence_description = {"tokens": "int ", "seq_labels": "int"}
-dataset = TFRecordDataset("/tmp/data.tfrecord",
+dataset = TFRecordDataset("/tmp/data.tfrecord_tj",
                           index_path=None,
-			  description=context_description,
-			  transform=pad_sequence_feats,
-			  sequence_description=sequence_description)
+                          description=context_description,
+                          transform=pad_sequence_feats,
+                          sequence_description=sequence_description)
 loader = torch.utils.data.DataLoader(dataset, batch_size=32)
 data = next(iter(loader))
 print(data)
@@ -191,7 +199,8 @@ for example, to perform dynamic padding.
 ```python
 import torch
 import numpy as np
-from tfrecord.torch.dataset import TFRecordDataset
+from tfrecord_tj.torch.dataset import TFRecordDataset
+
 
 def collate_fn(batch):
     from torch.utils.data._utils import collate
@@ -201,13 +210,14 @@ def collate_fn(batch):
     return (collate.default_collate(context),
             {k: rnn.pad_sequence(f, True) for (k, f) in feats_.items()})
 
+
 context_description = {"length": "int", "label": "int"}
 sequence_description = {"tokens": "int ", "seq_labels": "int"}
-dataset = TFRecordDataset("/tmp/data.tfrecord",
+dataset = TFRecordDataset("/tmp/data.tfrecord_tj",
                           index_path=None,
-			  description=context_description,
-			  transform=pad_sequence_feats,
-			  sequence_description=sequence_description)
+                          description=context_description,
+                          transform=pad_sequence_feats,
+                          sequence_description=sequence_description)
 loader = torch.utils.data.DataLoader(dataset, batch_size=32, collate_fn=collate_fn)
 data = next(iter(loader))
 print(data)
