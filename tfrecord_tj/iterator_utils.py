@@ -55,6 +55,22 @@ def sample_iterators(iterators: typing.List[typing.Iterator],
                 ratios = ratios / ratios.sum()
 
 
+def list_iterators(iterators: typing.List[typing.Iterator],
+                     infinite: bool = True) -> typing.Iterable[typing.Any]:
+
+    if infinite:
+        iterators = [cycle(iterator) for iterator in iterators]
+    else:
+        iterators = [iterator() for iterator in iterators]
+
+    while iterators:
+        choice = np.random.choice(len(iterators))
+        try:
+            yield next(iterators[choice])
+        except StopIteration:
+            if iterators:
+                del iterators[choice]
+
 
 def shuffle_iterator(iterator: typing.Iterator,
                      queue_size: int) -> typing.Iterable[typing.Any]:

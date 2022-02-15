@@ -19,7 +19,7 @@ def tfrecord_iterator(
     shard: typing.Optional[typing.Tuple[int, int]] = None,
     compression_type: typing.Optional[str] = None,
 ) -> typing.Iterable[memoryview]:
-    """Create an iterator over the tfrecord_tj dataset.
+    """Create an iterator over the tfrecord dataset.
 
     Since the tfrecords file stores each example as bytes, we can
     define an iterator over `datum_bytes_view`, which is a memoryview
@@ -193,7 +193,7 @@ def example_loader(
         workers (i.e. >1).
 
     compression_type: str, optional, default=None
-        The type of compression used for the tfrecord_tj. Choose either
+        The type of compression used for the tfrecord. Choose either
         'gzip' or None.
 
     Yields:
@@ -271,7 +271,7 @@ def sequence_loader(
         workers (i.e. >1).
 
     compression_type: str, optional, default=None
-        The type of compression used for the tfrecord_tj. Choose either
+        The type of compression used for the tfrecord. Choose either
         'gzip' or None.
 
     Yields:
@@ -362,7 +362,7 @@ def tfrecord_loader(
         passed, then all features contained in the file are extracted.
 
     compression_type: str, optional, default=None
-        The type of compression used for the tfrecord_tj. Choose either
+        The type of compression used for the tfrecord. Choose either
         'gzip' or None.
 
     Yields:
@@ -401,9 +401,9 @@ def multi_tfrecord_loader(data_pattern: str,
                           ) -> typing.Iterable[typing.Union[typing.Dict[str, np.ndarray],
                                                             typing.Tuple[typing.Dict[str, np.ndarray],
                                                                          typing.Dict[str, typing.List[np.ndarray]]]]]:
-    """Create an iterator by reading and merging multiple tfrecord_tj datasets.
+    """Create an iterator by reading and merging multiple tfrecord datasets.
 
-    NOTE: Sharding is currently unavailable for the multi tfrecord_tj loader.
+    NOTE: Sharding is currently unavailable for the multi tfrecord loader.
 
     Params:
     -------
@@ -434,9 +434,9 @@ def multi_tfrecord_loader(data_pattern: str,
         passed, then all features contained in the file are extracted.
 
     compression_type: str, optional, default=None
-        The type of compression used for the tfrecord_tj. Choose either
+        The type of compression used for the tfrecord. Choose either
         'gzip' or None.
-    
+
     infinite: bool, optional, default=True
         Whether the returned iterator should be infinite or not
 
@@ -454,3 +454,25 @@ def multi_tfrecord_loader(data_pattern: str,
                                  )
                for split in splits.keys()]
     return iterator_utils.sample_iterators(loaders, list(splits.values()), infinite=infinite)
+
+
+def list_tfrecord_loader(data_list: list,
+                          index_list: typing.Union[list, None],
+                          description: typing.Union[typing.List[str], typing.Dict[str, str], None] = None,
+                          sequence_description: typing.Union[typing.List[str], typing.Dict[str, str], None] = None,
+                          compression_type: typing.Optional[str] = None,
+                          infinite: bool = True,
+                          ) -> typing.Iterable[typing.Union[typing.Dict[str, np.ndarray],
+                                                            typing.Tuple[typing.Dict[str, np.ndarray],
+                                                                         typing.Dict[str, typing.List[np.ndarray]]]]]:
+
+
+    loaders = [functools.partial(tfrecord_loader, data_path=data_list[i],
+                                 index_path=index_list[i] \
+                                     if index_list is not None else None,
+                                 description=description,
+                                 sequence_description=sequence_description,
+                                 compression_type=compression_type,
+                                 )
+               for i in range(len(data_list))]
+    return iterator_utils.list_iterators(loaders, infinite=infinite)
